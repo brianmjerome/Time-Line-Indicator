@@ -3,26 +3,60 @@ Time-Line-Indicator
 
 Plugin that adds a time indicator in the form of a line to Extensible's Calendar Pro to be shown on the Day/Week/Multi-Day Views.
 
-Here is the code:
+First Step:
+-----------
 
-**calendar/template/DateBody.js** -- add the following line before the '<table ...>' in the superclass call:
+**calendar/template/DateBody.js** -- add the following line before the *<table ...* in the superclass call:
+
 `
 '<hr id="' + this.id.substring(0, this.id.length-3) + '-hd-time-indicator" class="time-indicator" style="top:0px;visibility: hidden;"></hr>',
 `
 
 So it should look something like this:
+
 `
 calendar.template.DayBody.superclass.constructor.call(this,
             '<hr id="' + this.id.substring(0, this.id.length-3) + '-hd-time-indicator" class="time-indicator" style="top:0px;visibility: hidden;"></hr>',
             '<table class="ext-cal-bg-tbl" cellspacing="0" cellpadding="0" style="height:{dayHeight}px;">',
 `
 
-next step:
+Next Step:
 ----------
+
 **calendar/view/Month.js** -- add the following code into the initClock function's *run* function:
 
+`
+            var formattedTime = Ext.Date.format(t, Calendar.Date.use24HourTime ? 'G:i' : 'g:ia');
+            var indicator = Ext.get(this.id + '-time-indicator');
+
+            if(el !== null && indicator !== null){
+            // move indicator based on time
+            var hourInterval = 42,
+                minuteInterval = hourInterval / 59,
+                fullTime = formattedTime,
+                length = fullTime.length,
+                am = fullTime.substring(length-2, length) === "am",
+                h_px = am ? 0 : hourInterval * 12,
+                m_px = 0;
+            
+            var hour = parseInt(fullTime.substring(0, length == 7 ? 2 : 1), 10),
+                min  = parseInt(fullTime.substring(length == 7 ? 3 : 2, length == 7 ? 5 : 4), 10);
+            
+            h_px = h_px + ((!am && hour == 12) ? 0 : (hourInterval * hour)),
+                m_px = m_px + (minuteInterval * min);
+            
+            if(indicator.dom.style.visibility === 'hidden'){
+                indicator.show();
+            }
+            indicator.setTop(h_px + m_px);
+            }
+            else if(indicator !== null){
+            indicator.hide();
+            }
+`
 
 So it should look like this:
+
 `
 //private
     initClock : function(){
