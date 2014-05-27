@@ -19,7 +19,7 @@ calendar.template.DayBody.superclass.constructor.call(this,
 
 next step:
 ----------
-**calendar/view/Month.js** -- add the following code into the initClock function's 'run' function:
+**calendar/view/Month.js** -- add the following code into the initClock function's *run* function:
 `
 var formattedTime = Ext.Date.format(t, Calendar.Date.use24HourTime ? 'G:i' : 'g:ia'),
                         indicator = Ext.get(this.id + '-time-indicator');
@@ -98,6 +98,7 @@ So it should look like this:
                             ...
 `
 
+
 CSS
 ---
 Here is the css for the time-indcator:
@@ -114,9 +115,9 @@ Here is the css for the time-indcator:
 }
 `
 
+
 Optional
 --------
-
 If one wants, the event css class can be changed to have a z-index higher than the z-index in the time-indicator class:
 `
 .ext-cal-day-col .ext-cal-evr,
