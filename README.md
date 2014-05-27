@@ -20,35 +20,7 @@ calendar.template.DayBody.superclass.constructor.call(this,
 next step:
 ----------
 **calendar/view/Month.js** -- add the following code into the initClock function's *run* function:
-`
-var formattedTime = Ext.Date.format(t, Calendar.Date.use24HourTime ? 'G:i' : 'g:ia');
-var indicator = Ext.get(this.id + '-time-indicator');
 
-if(el !== null && indicator !== null){
-// move indicator based on time
-var hourInterval = 42,
-    minuteInterval = hourInterval / 59,
-    fullTime = formattedTime,
-    length = fullTime.length,
-    am = fullTime.substring(length-2, length) === "am",
-    h_px = am ? 0 : hourInterval * 12,
-    m_px = 0;
-
-var hour = parseInt(fullTime.substring(0, length == 7 ? 2 : 1), 10),
-    min  = parseInt(fullTime.substring(length == 7 ? 3 : 2, length == 7 ? 5 : 4), 10);
-
-h_px = h_px + ((!am && hour == 12) ? 0 : (hourInterval * hour)),
-    m_px = m_px + (minuteInterval * min);
-
-if(indicator.dom.style.visibility === 'hidden'){
-    indicator.show();
-}
-indicator.setTop(h_px + m_px);
-}
-else if(indicator !== null){
-indicator.hide();
-}
-`
 
 So it should look like this:
 `
