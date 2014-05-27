@@ -6,8 +6,7 @@ Plugin that adds a time indicator in the form of a line to Extensible's Calendar
 First Step:
 -----------
 
-**calendar/template/DateBody.js** -- add the following line before the *<table ...* in the superclass call:
-
+**calendar/template/DateBody.js** -- add the following line before the *<table ...&gt;* in the superclass call:
 `
 '<hr id="' + this.id.substring(0, this.id.length-3) + '-hd-time-indicator" class="time-indicator" style="top:0px;visibility: hidden;"></hr>',
 `
@@ -23,9 +22,8 @@ calendar.template.DayBody.superclass.constructor.call(this,
 Next Step:
 ----------
 
-**calendar/view/Month.js** -- add the following code into the initClock function's *run* function:
+**calendar/view/Month.js** -- add the following code into the initClock *run* function:
 
-`
             var formattedTime = Ext.Date.format(t, Calendar.Date.use24HourTime ? 'G:i' : 'g:ia');
             var indicator = Ext.get(this.id + '-time-indicator');
 
@@ -53,61 +51,60 @@ Next Step:
             else if(indicator !== null){
             indicator.hide();
             }
-`
+
 
 So it should look like this:
 
-`
-//private
-    initClock : function(){
-        if(Ext.fly(me.itemId + '-clock') !== null){
-            me.prevClockDay = new Date().getDay();
-            if(me.clockTask){
-                Ext.util.TaskManager.stop(me.clockTask);
-            }
-            me.clockTask = Ext.util.TaskManager.start({
+            initClock : function(){
+                if(Ext.fly(me.itemId + '-clock') !== null){
+                me.prevClockDay = new Date().getDay();
+                if(me.clockTask){
+                    Ext.util.TaskManager.stop(me.clockTask);
+                }
+                me.clockTask = Ext.util.TaskManager.start({
                 //gets called every second
                 run: function(){
                     var el = Ext.fly(this.id + '-clock'),
-                        t = new Date();
-
+                    t = new Date();
+            
                     var formattedTime = Ext.Date.format(t, Calendar.Date.use24HourTime ? 'G:i' : 'g:ia'),
                         indicator = Ext.get(this.id + '-time-indicator');
-
+            
                     if(el !== null && indicator !== null){
                         // move indicator based on time
                         var hourInterval = 42,
-                            minuteInterval = hourInterval / 59,
-                            fullTime = formattedTime,
-                            length = fullTime.length,
-                            am = fullTime.substring(length-2, length) === "am",
-                            h_px = am ? 0 : hourInterval * 12,
-                            m_px = 0;
-
+                        minuteInterval = hourInterval / 59,
+                        fullTime = formattedTime,
+                        length = fullTime.length,
+                        am = fullTime.substring(length-2, length) === "am",
+                        h_px = am ? 0 : hourInterval * 12,
+                        m_px = 0;
+            
                         var hour = parseInt(fullTime.substring(0, length == 7 ? 2 : 1), 10),
-                            min  = parseInt(fullTime.substring(length == 7 ? 3 : 2, length == 7 ? 5 : 4), 10);
-
+                        min  = parseInt(fullTime.substring(length == 7 ? 3 : 2, length == 7 ? 5 : 4), 10);
+                        
                         h_px = h_px + ((!am && hour == 12) ? 0 : (hourInterval * hour)),
-                            m_px = m_px + (minuteInterval * min);
-
+                        m_px = m_px + (minuteInterval * min);
+            
                         if(indicator.dom.style.visibility === 'hidden'){
-                            indicator.show();
+                                    indicator.show();
                         }
                         indicator.setTop(h_px + m_px);
                     }
                     else if(indicator !== null){
                         indicator.hide();
                     }
+                        
+            if(t.getDay() == me.prevClockDay){
+                if(el){
+                    ...
 
-                    if(t.getDay() == me.prevClockDay){
-                        if(el){
-                            ...
-`
 
 
 CSS
 ---
 Here is the css for the time-indcator:
+
 `
 .time-indicator {
     position: relative;
@@ -125,6 +122,7 @@ Here is the css for the time-indcator:
 Optional
 --------
 If one wants, the event css class can be changed to have a z-index higher than the z-index in the time-indicator class:
+
 `
 .ext-cal-day-col .ext-cal-evr,
 .ext-cal-day-col .ext-cal-evi {
