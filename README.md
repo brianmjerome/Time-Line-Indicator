@@ -119,8 +119,7 @@ Here is the css for the time-indcator:
 `
 
 In the end you should end up something like this:
-![result](http://www.sencha.com/forum/attachment.php?attachmentid=44899&d=1373986086)
-
+<a href="http://imgur.com/fbR6IG3"><img src="http://i.imgur.com/fbR6IG3.png?1" title="Hosted by imgur.com" /></a>
 
 Optional
 --------
