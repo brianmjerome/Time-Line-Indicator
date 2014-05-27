@@ -118,6 +118,9 @@ Here is the css for the time-indcator:
 }
 `
 
+In the end you should end up something like this:
+![result](http://www.sencha.com/forum/attachment.php?attachmentid=44899&d=1373986086)
+
 
 Optional
 --------
