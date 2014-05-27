@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Time Line Indicator by brianmjerome</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Time Line Indicator</h1>
+        <h2>Plugin that adds a time indicator in the form of a line to Extensible&#39;s Calendar Pro to be shown on the Day/Week/Multi-Day Views.</h2>
+        <a href="https://github.com/brianmjerome/Time-Line-Indicator" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="time-line-indicator" class="anchor" href="#time-line-indicator"><span class="octicon octicon-link"></span></a>Time-Line-Indicator</h1>
+
+<p>Plugin that adds a time indicator in the form of a line to Extensible's Calendar Pro to be shown on the Day/Week/Multi-Day Views.</p>
+
+<h2>
+<a name="first-step" class="anchor" href="#first-step"><span class="octicon octicon-link"></span></a>First Step:</h2>
+
+<p><strong>calendar/template/DateBody.js</strong> -- add the following line before the <em>&lt;table ...&gt;</em> in the superclass call:
+<code>
+'&lt;hr id="' + this.id.substring(0, this.id.length-3) + '-hd-time-indicator" class="time-indicator" style="top:0px;visibility: hidden;"&gt;&lt;/hr&gt;',
+</code></p>
+
+<p>So it should look something like this:</p>
+
+<p><code>
+calendar.template.DayBody.superclass.constructor.call(this,
+            '&lt;hr id="' + this.id.substring(0, this.id.length-3) + '-hd-time-indicator" class="time-indicator" style="top:0px;visibility: hidden;"&gt;&lt;/hr&gt;',
+            '&lt;table class="ext-cal-bg-tbl" cellspacing="0" cellpadding="0" style="height:{dayHeight}px;"&gt;',
+</code></p>
+
+<h2>
+<a name="next-step" class="anchor" href="#next-step"><span class="octicon octicon-link"></span></a>Next Step:</h2>
+
+<p><strong>calendar/view/Month.js</strong> -- add the following code into the initClock <em>run</em> function:</p>
+
+<pre><code>        var formattedTime = Ext.Date.format(t, Calendar.Date.use24HourTime ? 'G:i' : 'g:ia');
+        var indicator = Ext.get(this.id + '-time-indicator');
+
+        if(el !== null &amp;&amp; indicator !== null){
+        // move indicator based on time
+        var hourInterval = 42,
+            minuteInterval = hourInterval / 59,
+            fullTime = formattedTime,
+            length = fullTime.length,
+            am = fullTime.substring(length-2, length) === "am",
+            h_px = am ? 0 : hourInterval * 12,
+            m_px = 0;
+
+        var hour = parseInt(fullTime.substring(0, length == 7 ? 2 : 1), 10),
+            min  = parseInt(fullTime.substring(length == 7 ? 3 : 2, length == 7 ? 5 : 4), 10);
+
+        h_px = h_px + ((!am &amp;&amp; hour == 12) ? 0 : (hourInterval * hour)),
+            m_px = m_px + (minuteInterval * min);
+
+        if(indicator.dom.style.visibility === 'hidden'){
+            indicator.show();
+        }
+        indicator.setTop(h_px + m_px);
+        }
+        else if(indicator !== null){
+        indicator.hide();
+        }
+</code></pre>
+
+<p>So it should look like this:</p>
+
+<pre><code>        initClock : function(){
+            if(Ext.fly(me.itemId + '-clock') !== null){
+            me.prevClockDay = new Date().getDay();
+            if(me.clockTask){
+                Ext.util.TaskManager.stop(me.clockTask);
+            }
+            me.clockTask = Ext.util.TaskManager.start({
+            //gets called every second
+            run: function(){
+                var el = Ext.fly(this.id + '-clock'),
+                t = new Date();
+
+                var formattedTime = Ext.Date.format(t, Calendar.Date.use24HourTime ? 'G:i' : 'g:ia'),
+                    indicator = Ext.get(this.id + '-time-indicator');
+
+                if(el !== null &amp;&amp; indicator !== null){
+                    // move indicator based on time
+                    var hourInterval = 42,
+                    minuteInterval = hourInterval / 59,
+                    fullTime = formattedTime,
+                    length = fullTime.length,
+                    am = fullTime.substring(length-2, length) === "am",
+                    h_px = am ? 0 : hourInterval * 12,
+                    m_px = 0;
+
+                    var hour = parseInt(fullTime.substring(0, length == 7 ? 2 : 1), 10),
+                    min  = parseInt(fullTime.substring(length == 7 ? 3 : 2, length == 7 ? 5 : 4), 10);
+
+                    h_px = h_px + ((!am &amp;&amp; hour == 12) ? 0 : (hourInterval * hour)),
+                    m_px = m_px + (minuteInterval * min);
+
+                    if(indicator.dom.style.visibility === 'hidden'){
+                                indicator.show();
+                    }
+                    indicator.setTop(h_px + m_px);
+                }
+                else if(indicator !== null){
+                    indicator.hide();
+                }
+
+        if(t.getDay() == me.prevClockDay){
+            if(el){
+                ...
+</code></pre>
+
+<h2>
+<a name="css" class="anchor" href="#css"><span class="octicon octicon-link"></span></a>CSS</h2>
+
+<p>Here is the css for the time-indcator:</p>
+
+<p><code>
+.time-indicator {
+    position: relative;
+    border: none;
+    border-top: 1px solid red;
+    border-bottom: 1px solid red;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+}
+</code></p>
+
+<p>In the end you should end up something like this:
+<a href="http://imgur.com/fbR6IG3"><img src="http://i.imgur.com/fbR6IG3.png?1" title="Hosted by imgur.com"></a></p>
+
+<h2>
+<a name="optional" class="anchor" href="#optional"><span class="octicon octicon-link"></span></a>Optional</h2>
+
+<p>If one wants, the event css class can be changed to have a z-index higher than the z-index in the time-indicator class:</p>
+
+<p><code>
+.ext-cal-day-col .ext-cal-evr,
+.ext-cal-day-col .ext-cal-evi {
+    white-space: normal;
+    border-right: 1px solid #fff;
+    z-index: 2;  //time-indicator has z-index: 1;
+}
+</code></p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/brianmjerome/Time-Line-Indicator/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/brianmjerome/Time-Line-Indicator/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/brianmjerome/Time-Line-Indicator"></a> is maintained by <a href="https://github.com/brianmjerome">brianmjerome</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
